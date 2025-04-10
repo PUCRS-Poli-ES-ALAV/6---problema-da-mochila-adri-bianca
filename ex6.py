@@ -9,29 +9,32 @@ sys.setrecursionlimit(10000)
 instr_recursive = [0]
 instr_dynamic = [0]
 
-def edit_distance_recursive(s1, s2, m, n, iterations=[0]):
+def edit_distance_recursive(s1, s2, i, j, iterations=[0]):
     iterations[0] += 1
     instr_recursive[0] += 1
 
-    if m == 0:
+    if i == 0:
         instr_recursive[0] += 1
-        return n, iterations[0]
-    if n == 0:
+        return j, iterations[0]
+    if j == 0:
         instr_recursive[0] += 1
-        return m, iterations[0]
-    
-    if s1[m-1] == s2[n-1]:
-        instr_recursive[0] += 1
-        return edit_distance_recursive(s1, s2, m-1, n-1, iterations)
-    
-    insert_op, _ = edit_distance_recursive(s1, s2, m, n-1, iterations)
-    instr_recursive[0] += 1
-    remove_op, _ = edit_distance_recursive(s1, s2, m-1, n, iterations)
-    instr_recursive[0] += 1
-    replace_op, _ = edit_distance_recursive(s1, s2, m-1, n-1, iterations)
-    instr_recursive[0] += 2
+        return i, iterations[0]
 
-    return 1 + min(insert_op, remove_op, replace_op), iterations[0]
+    if s1[i-1] == s2[j-1]:
+        instr_recursive[0] += 1
+        return edit_distance_recursive(s1, s2, i-1, j-1, iterations)
+
+    # Três operações possíveis
+    instr_recursive[0] += 1
+    sub_op, _ = edit_distance_recursive(s1, s2, i-1, j-1, iterations)  # Substituição
+    instr_recursive[0] += 1
+    ins_op, _ = edit_distance_recursive(s1, s2, i, j-1, iterations)    # Inserção
+    instr_recursive[0] += 1
+    rem_op, _ = edit_distance_recursive(s1, s2, i-1, j, iterations)    # Remoção
+
+    instr_recursive[0] += 1
+    return 1 + min(sub_op, ins_op, rem_op), iterations[0]
+
 
 def edit_distance_dynamic(s1, s2):
     m, n = len(s1), len(s2)
